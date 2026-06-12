@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OCA\UserOrcid\AppInfo;
 
+use OCA\UserOrcid\Login\OrcidLogin;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -17,6 +18,7 @@ class Application extends App implements IBootstrap {
 	}
 
 	public function register(IRegistrationContext $context): void {
+		$context->registerAlternativeLogin(OrcidLogin::class);
 	}
 
 	public function boot(IBootContext $context): void {

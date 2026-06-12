@@ -75,8 +75,17 @@ master when they have none locally. Internal endpoints (Bearer
 
 All sharding calls are guarded — the app works standalone.
 
-## Not ported (yet)
+## Logging in with ORCID
 
-The ownCloud 7 app also allowed **logging in** with ORCID (unauthenticated
-callback resolving the iD to an account, with cross-silo redirect). Login is
-handled by the institutional flow these days; revisit if needed.
+A deliberately low-key "Log in with ORCID" link under the login form
+(`IAlternativeLogin`) starts the same OAuth flow with `state=login`: the
+callback resolves the **verified** iD to the connected account and logs the
+user in — the stable identity across a researcher's institutional moves.
+
+- Unknown iD → friendly error telling the user to log in normally first and
+  connect the iD in personal settings. Nothing is created implicitly.
+- files_sharding: a silo restarts the flow on the master; the master resolves
+  the home silo and hands over with the same one-time-token exchange the
+  institutional login uses (`/apps/files_sharding/login?token=…`).
+- Note: like the institutional exchange, this path does not go through
+  Nextcloud server-side 2FA.

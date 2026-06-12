@@ -143,8 +143,12 @@ class OrcidService {
 		return $this->urlGenerator->linkToRouteAbsolute('user_orcid.callback.receive');
 	}
 
-	/** The orcid.org authorize URL the personal settings button opens. */
-	public function authorizeUrl(): string {
+	/**
+	 * The orcid.org authorize URL. $state distinguishes the two flows the
+	 * callback serves: 'connect' (attach an iD to the logged-in account) and
+	 * 'login' (resolve the iD to an account and log in).
+	 */
+	public function authorizeUrl(string $state = 'connect'): string {
 		$client = $this->getClientConfig();
 		if ($client['clientAppID'] === '') {
 			return '';
@@ -154,6 +158,7 @@ class OrcidService {
 			'response_type' => 'code',
 			'scope'         => '/authenticate',
 			'redirect_uri'  => $this->redirectUri(),
+			'state'         => $state,
 		]);
 	}
 
@@ -192,6 +197,46 @@ class OrcidService {
 			$this->logger->error('user_orcid: token exchange failed: ' . $e->getMessage());
 			return null;
 		}
+	}
+
+	/**
+	 * Where to send a visitor whose verified ORCID iD is $orcid:
+	 *  - ['action' => 'unknown']                     no account connected
+	 *  - ['action' => 'local',    'uid' => …]        log in on this node
+	 *  - ['action' => 'redirect', 'url' => …]        owner's silo (one-time token)
+	 *  - ['action' => 'master',   'url' => …]        restart the flow on the master
+	 */
+	public function resolveLoginTarget(string $orcid): array {
+		$uid = $this->userFromOrcid($orcid);
+		if ($uid === '') {
+			return ['action' => 'unknown'];
+		}
+		if ($this->shardingConfigured() && !$this->isMaster()) {
+			// Only the master can resolve home silos and issue exchange tokens —
+			// restart the login flow there (its redirect URI is registered too).
+			$master = rtrim((string)$this->config->getSystemValue('files_sharding_master_url', ''), '/');
+			if ($master !== '') {
+				return ['action' => 'master', 'url' => $master . '/index.php/apps/user_orcid/login'];
+			}
+			return ['action' => 'local', 'uid' => $uid];
+		}
+		if ($this->shardingConfigured()
+			&& class_exists(\OCA\FilesSharding\Service\ShardingService::class)
+			&& class_exists(\OCA\FilesSharding\Service\TokenService::class)) {
+			try {
+				$server = \OCP\Server::get(\OCA\FilesSharding\Service\ShardingService::class)->getUserServer($uid);
+				$url    = $server ? rtrim($server->getUrl(), '/') : '';
+				if ($url !== '') {
+					$token = \OCP\Server::get(\OCA\FilesSharding\Service\TokenService::class)->issue($uid);
+					return ['action' => 'redirect', 'url' => $url
+						. '/index.php/apps/files_sharding/login?token=' . urlencode($token)
+						. '&user=' . urlencode($uid)];
+				}
+			} catch (\Throwable $e) {
+				$this->logger->error('user_orcid: silo resolution failed: ' . $e->getMessage());
+			}
+		}
+		return ['action' => 'local', 'uid' => $uid];
 	}
 
 	// ── files_sharding glue (all guarded — app works standalone) ─────────────

@@ -1,0 +1,10 @@
+/* Keep the ORCID login entry low-key under the login form */
+.orcid-alt-login {
+	font-size: 0.9em;
+	opacity: 0.75;
+}
+
+.orcid-alt-login:hover,
+.orcid-alt-login:focus {
+	opacity: 1;
+}

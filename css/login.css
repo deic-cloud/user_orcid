@@ -1,10 +1,14 @@
-/* Keep the ORCID login entry low-key under the login form */
-.orcid-alt-login {
-	font-size: 0.9em;
-	opacity: 0.75;
+/* Style the ORCID entry like the "Log in with a device" / "Forgot password?"
+   text links instead of the boxed secondary button NC gives alternative
+   logins by default. */
+#alternative-logins .orcid-alt-login {
+	background-color: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	font-weight: normal !important;
 }
 
-.orcid-alt-login:hover,
-.orcid-alt-login:focus {
-	opacity: 1;
+#alternative-logins .orcid-alt-login:hover,
+#alternative-logins .orcid-alt-login:focus {
+	background-color: var(--color-background-hover, rgba(0, 0, 0, 0.05)) !important;
 }

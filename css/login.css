@@ -1,14 +1,16 @@
-/* Style the ORCID entry like the "Log in with a device" / "Forgot password?"
-   text links instead of the boxed secondary button NC gives alternative
-   logins by default. */
-#alternative-logins .orcid-alt-login {
+/* Core renders every alternative login as a filled secondary button; make
+   the ORCID entry read like the tertiary text links next to it ("Log in
+   with a device", "Forgot password?") — transparent, login text colour,
+   subtle hover — instead of a permanently highlighted box. */
+#alternative-logins .orcid-alt-login.button-vue {
 	background-color: transparent !important;
 	border: none !important;
 	box-shadow: none !important;
+	color: var(--color-main-text) !important;
 	font-weight: normal !important;
 }
 
-#alternative-logins .orcid-alt-login:hover,
-#alternative-logins .orcid-alt-login:focus {
-	background-color: var(--color-background-hover, rgba(0, 0, 0, 0.05)) !important;
+#alternative-logins .orcid-alt-login.button-vue:hover,
+#alternative-logins .orcid-alt-login.button-vue:focus-visible {
+	background-color: var(--color-background-hover) !important;
 }

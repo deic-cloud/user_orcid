@@ -1,10 +1,19 @@
-/* Core renders every alternative login as a filled secondary button; make
-   the ORCID entry read like the tertiary text links next to it ("Log in
-   with a device", "Forgot password?") — transparent, login text colour,
-   subtle hover — instead of a permanently highlighted box. */
+/* The login box renders three links in two separate containers: core puts
+   "Log in with a device" / "Forgot password?" as tertiary buttons inside the
+   form wrapper, while alternative logins (ours) live in a sibling
+   #alternative-logins block forced to the filled secondary variant. These
+   rules make the ORCID entry homogeneous with the other two: same vertical
+   rhythm, same transparent tertiary look and hover, plus the ORCID iD mark. */
+
+/* Match the form wrapper's gap (2 × grid-baseline) above and between entries */
+#alternative-logins {
+	margin-top: calc(2 * var(--default-grid-baseline)) !important;
+	gap: calc(2 * var(--default-grid-baseline)) !important;
+}
+
+/* Tertiary look instead of the filled secondary button */
 #alternative-logins .orcid-alt-login.button-vue {
 	background-color: transparent !important;
-	border: none !important;
 	box-shadow: none !important;
 	color: var(--color-main-text) !important;
 	font-weight: normal !important;
@@ -13,4 +22,15 @@
 #alternative-logins .orcid-alt-login.button-vue:hover,
 #alternative-logins .orcid-alt-login.button-vue:focus-visible {
 	background-color: var(--color-background-hover) !important;
+}
+
+/* Official ORCID iD mark before the label */
+#alternative-logins .orcid-alt-login .button-vue__text::before {
+	content: '';
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin-right: 8px;
+	vertical-align: text-bottom;
+	background: url(../img/orcid.svg) no-repeat center / contain;
 }

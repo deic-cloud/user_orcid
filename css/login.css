@@ -36,6 +36,6 @@
 	background: url(../img/orcid.svg) no-repeat center / contain;
 }
 
-#body-login a:not(.button):hover, #body-login a:not(.button):focus {
+a.orcid-alt-login:not(.button):hover, a.orcid-alt-login:not(.button):focus {
   text-decoration: none!important;
 }

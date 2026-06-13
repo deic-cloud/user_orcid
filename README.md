@@ -26,12 +26,20 @@ directions: user → ORCID and ORCID → user (used e.g. by files_zenodo).
 ## Admin configuration
 
 Settings → Administration → Additional settings: Client ID and secret from
-[orcid.org/developer-tools](https://orcid.org/developer-tools); register the
-shown redirect URI there (one per node in a multi-node setup). The base URL
+[orcid.org/developer-tools](https://orcid.org/developer-tools). The base URL
 can be pointed at https://sandbox.orcid.org for testing.
 
+**Redirect URIs:** ORCID validates the redirect against the list registered
+for the client app. Register **every node's** redirect URI there (the admin
+page shows the local one) — the master *and* each silo, e.g.
+`https://cloud.example.org/index.php/apps/user_orcid/callback` and
+`https://silo1.example.org/index.php/apps/user_orcid/callback`. A single
+client app (configured on the master only) is enough; silos fetch the
+credentials from the master, but each silo still serves the OAuth flow from
+its own origin, so its callback URI must be registered.
+
 App config keys (`oc_appconfig`, app `user_orcid`): `clientAppID`,
-`clientSecret`, `baseUrl`.
+`clientSecret`, `baseUrl` — set on the master; silos fetch and cache them.
 
 ## API for other apps
 

@@ -13,15 +13,16 @@
 
 /* Tertiary look instead of the filled secondary button */
 #alternative-logins .orcid-alt-login.button-vue {
-	background-color: transparent !important;
+	background-color: transparent;
 	box-shadow: none !important;
 	color: var(--color-main-text) !important;
 	font-weight: normal !important;
+	border: none;
 }
 
 #alternative-logins .orcid-alt-login.button-vue:hover,
 #alternative-logins .orcid-alt-login.button-vue:focus-visible {
-	background-color: var(--color-background-hover) !important;
+	background-color: color-mix(in srgb, var(--color-primary-element) 8%, transparent);
 }
 
 /* Official ORCID iD mark before the label */
@@ -33,4 +34,8 @@
 	margin-right: 8px;
 	vertical-align: text-bottom;
 	background: url(../img/orcid.svg) no-repeat center / contain;
+}
+
+#body-login a:not(.button):hover, #body-login a:not(.button):focus {
+  text-decoration: none!important;
 }

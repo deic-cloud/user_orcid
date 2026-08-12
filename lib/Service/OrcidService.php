@@ -245,8 +245,18 @@ class OrcidService {
 		if (!$this->shardingConfigured()) {
 			return true; // standalone behaves like the source of truth
 		}
-		$val = $this->config->getSystemValue('files_sharding_master', false);
-		return $val === true || $val === 1 || $val === '1' || $val === 'true';
+		// Delegate to files_sharding's authoritative master detection: the explicit
+		// files_sharding_master flag OR overwrite.cli.url's authority matching
+		// files_sharding_master_url. Checking only the explicit flag here mis-detected
+		// the URL-auto-detected master (flag unset, master_url == overwrite.cli.url) as
+		// a SILO, so it HTTP-called ITSELF for every ORCID lookup — a blocking mod_php
+		// self-call that starves workers and times out (10s), degrading the whole node.
+		try {
+			return \OCP\Server::get(\OCA\FilesSharding\Service\ShardingService::class)->isMaster();
+		} catch (\Throwable) {
+			$val = $this->config->getSystemValue('files_sharding_master', false);
+			return $val === true || $val === 1 || $val === '1' || $val === 'true';
+		}
 	}
 
 	private function shardingConfigured(): bool {
